@@ -33,6 +33,7 @@ class FirebaseAnimatedList extends StatefulWidget {
     this.shrinkWrap = false,
     this.padding,
     this.duration = const Duration(milliseconds: 300),
+    this.emptyChild,
   }) : super(key: key) {
     assert(itemBuilder != null);
   }
@@ -48,6 +49,9 @@ class FirebaseAnimatedList extends StatefulWidget {
   /// A widget to display while the query is loading. Defaults to an empty
   /// Container().
   final Widget defaultChild;
+
+  ///A widget to display if the query returns null
+  final Widget emptyChild;
 
   /// Called, as needed, to build list item widgets.
   ///
@@ -136,6 +140,7 @@ class FirebaseAnimatedListState extends State<FirebaseAnimatedList> {
       GlobalKey<AnimatedListState>();
   List<DataSnapshot> _model;
   bool _loaded = false;
+  bool _isEmpty = false;
 
   @override
   void didChangeDependencies() {
@@ -198,7 +203,14 @@ class FirebaseAnimatedListState extends State<FirebaseAnimatedList> {
     setState(() {});
   }
 
-  void _onValue(DataSnapshot _) {
+  void _onValue(DataSnapshot snapshot) {
+    if (snapshot.value == null) {
+      setState(() {
+        _isEmpty = true;
+      });
+    } else {
+      _isEmpty = false;
+    }
     setState(() {
       _loaded = true;
     });
@@ -213,6 +225,9 @@ class FirebaseAnimatedListState extends State<FirebaseAnimatedList> {
   Widget build(BuildContext context) {
     if (!_loaded) {
       return widget.defaultChild ?? Container();
+    }
+    if (_isEmpty) {
+      return widget.emptyChild ?? Container();
     }
     return AnimatedList(
       key: _animatedListKey,
