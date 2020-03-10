@@ -1,3 +1,5 @@
+## 3.1.4
+* added `onchildEmpty` option to Firebase Animaged List.
 ## 3.1.3
 
 * Replace deprecated `getFlutterEngine` call on Android.
